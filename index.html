@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>無限煉製小遊戲入口站</title>
+<meta name="description" content="《無限煉製》本傳與玩家自製小遊戲的入口站。">
+<meta name="theme-color" content="#140f0a">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚗️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#140f0a;
+  --bg2:#1d1610;
+  --panel:#261c13;
+  --line:#4a3924;
+  --gold:#e9c46a;
+  --gold-soft:#c9a24a;
+  --cream:#f4e8cc;
+  --muted:#a8977a;
+  --orange1:#f08a4b;
+  --orange2:#c9512c;
+  --purple:#b48cff;
+  --teal:#7fd0b8;
+  --serif:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--cream);font-family:var(--sans);line-height:1.7;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(233,196,106,.14),transparent 70%);
+  background-repeat:no-repeat;
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 18px}
+
+/* hero */
+.hero{padding:56px 0 28px;text-align:center}
+.hero h1{
+  font-family:var(--serif);font-weight:700;font-size:clamp(30px,7vw,52px);line-height:1.25;margin:0 0 12px;
+  color:var(--cream);text-shadow:0 0 32px rgba(233,196,106,.35);letter-spacing:.04em;
+}
+.hero p{margin:0 auto;max-width:34em;color:var(--muted);font-size:15px}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:28px auto 0;max-width:760px}
+.chip{
+  display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;
+  background:rgba(38,28,19,.9);border:1.5px solid var(--line);font-size:15px;color:var(--cream);
+  transition:transform .15s,border-color .15s,box-shadow .15s;
+}
+.chip:hover{transform:translateY(-2px)}
+.chip .e{font-size:18px;line-height:1}
+.chip.p{border-color:rgba(180,140,255,.6)}
+.chip.p:hover{box-shadow:0 0 16px rgba(180,140,255,.35)}
+.chip.t{border-color:rgba(127,208,184,.5)}
+.chip.t:hover{box-shadow:0 0 16px rgba(127,208,184,.3)}
+.chip.g{border-color:rgba(233,196,106,.7);box-shadow:0 0 14px rgba(233,196,106,.2)}
+
+/* sections */
+section{padding:34px 0 8px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.sec-head h2{font-family:var(--serif);font-size:24px;margin:0;color:var(--gold)}
+.sec-head span{color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px}
+
+/* cards */
+.card{
+  display:flex;flex-direction:column;background:var(--panel);border:1.5px solid var(--line);
+  border-radius:18px;overflow:hidden;scroll-margin-top:16px;
+  transition:transform .18s,box-shadow .18s,border-color .18s;
+}
+.card:hover{transform:translateY(-3px);border-color:var(--gold-soft);box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 22px rgba(233,196,106,.12)}
+.card.purple:hover{border-color:var(--purple);box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 22px rgba(180,140,255,.2)}
+.thumb{position:relative;aspect-ratio:16/9;background:#0e0a07;overflow:hidden}
+.thumb img,.thumb svg{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover}
+.body{display:flex;flex-direction:column;flex:1;padding:16px 18px 18px;gap:8px}
+.body h3{font-family:var(--serif);font-size:20px;margin:0;color:var(--cream)}
+.body p{margin:0;font-size:14px;color:#d3c4a4;flex:1}
+.note{font-size:13px;color:var(--orange1);background:rgba(240,138,75,.1);border:1px solid rgba(240,138,75,.35);border-radius:10px;padding:6px 10px}
+.meta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px}
+.author{font-size:13px;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.go{
+  flex:none;padding:8px 20px;border-radius:12px;font-weight:700;font-size:15px;color:#fff;
+  background:linear-gradient(135deg,var(--orange1),var(--orange2));box-shadow:0 4px 14px rgba(201,81,44,.35);
+}
+.go:hover{filter:brightness(1.1)}
+
+/* featured main game */
+.card.feature{border-color:var(--gold-soft);box-shadow:0 0 28px rgba(233,196,106,.16)}
+@media(min-width:720px){
+  .card.feature{flex-direction:row}
+  .card.feature .thumb{flex:0 0 52%;aspect-ratio:auto;min-height:260px}
+  .card.feature .body{padding:26px 28px;justify-content:center}
+  .card.feature h3{font-size:28px}
+  .card.feature p{flex:none;font-size:16px}
+}
+
+footer{margin:48px 0 0;padding:24px 0 40px;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:13px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header class="hero wrap">
+  <h1>無限煉製小遊戲入口站</h1>
+  <p>《無限煉製》本傳,加上粉團與玩家們做的非官方小遊戲,都收在這裡。點下面的造物直接跳到那款遊戲。</p>
+  <nav class="chips" id="chips" aria-label="快速跳轉"></nav>
+</header>
+
+<main class="wrap">
+  <section id="main-game">
+    <div class="sec-head"><h2>遊戲本傳</h2></div>
+    <div class="grid" id="g-main"></div>
+  </section>
+  <section id="funtuan">
+    <div class="sec-head"><h2>粉團的小遊戲</h2><span>作者 Funtuan</span></div>
+    <div class="grid" id="g-funtuan"></div>
+  </section>
+  <section id="players">
+    <div class="sec-head"><h2>玩家自製區</h2></div>
+    <div class="grid" id="g-players"></div>
+  </section>
+</main>
+
+<footer class="wrap">
+  本站為玩家整理的非官方入口,各遊戲版權與內容歸原作者所有。
+</footer>
+
+<script>
+const GAMES = [
+  {id:"main", sec:"main", feature:true, name:"無限煉製", emoji:"⚗️", chip:"g",
+   url:"https://pillars-of-creation.funtuan.work/",
+   desc:"這是一款除了魔力以外毫無限制的文字合成遊戲ʕ⸝⸝⸝˙Ⱉ˙ʔ(大概)",
+   author:"Funtuan", art:"main"},
+
+  {id:"lounge", sec:"funtuan", name:"午後煉金坊", emoji:"☕", chip:"p",
+   url:"https://alchemy-lounge.onrender.com/",
+   desc:"由 Funtuan 打造,非官方版 3D 無限煉製。",
+   author:"Funtuan", art:"lounge"},
+
+  {id:"cards", sec:"funtuan", name:"窩要煉牌", emoji:"🃏", chip:"t",
+   url:"https://alchemy-cards.funtuan.workers.dev/",
+   img:"https://alchemy-cards.funtuan.workers.dev/promo/og.png",
+   desc:"把你在《無限煉製》的合成紀錄煉成卡牌,AI 依造物和配方設計,每張都不一樣。三分鐘一場的 1v1 即時對戰,有單人練習、線上配對、好友房和排位排行榜。",
+   author:"Funtuan", art:"cards"},
+
+  {id:"tower", sec:"funtuan", name:"煉金高塔", emoji:"🗼", chip:"p",
+   url:"https://alchemy-tower.funtuan.workers.dev/",
+   desc:"煉金祭壇浮在雲端的小島上,玩家們 3D 賦形出來的立體造物會一個接一個懸在塔頂上方擺盪。看準時機放下去,也可以先轉個方向、或讓高瘦的造物躺下來,想辦法把它們疊成一座搖搖晃晃的高塔。疊越高分數越高,造物掉下祭壇就扣一顆心,三顆扣完就結束。來挑戰你的最高紀錄吧!",
+   author:"Funtuan", art:"tower"},
+
+  {id:"spin", sec:"funtuan", name:"煉金陀螺", emoji:"🌀", chip:"t",
+   url:"https://alchemy-spin.funtuan.workers.dev/",
+   desc:"3D 賦形陀螺對戰,撞擊會把方塊打飛,顏色決定戰鬥能力。連勝挑戰,看你能贏幾場。",
+   author:"Funtuan", art:"spin"},
+
+  {id:"life", sec:"players", name:"煉金術師的一生", emoji:"📜", chip:"p",
+   url:"https://alchemist-life.pages.dev/",
+   desc:"有一天你看到了無限煉製,決定入坑,你還不知道你會遇到什麼。",
+   author:"粉紅色的派大星教授加博士先生", art:"life"},
+
+  {id:"relay", sec:"players", name:"無限煉製故事接龍", emoji:"💬", chip:"t",
+   url:"https://discord.com/channels/1530575211638816868/1551999859731734598/1552003441646108864",
+   desc:"把你的造物拿過來遊玩龐大世界觀的文字接龍遊戲!",
+   note:"需要登入官方 Discord 群組才能遊玩",
+   author:"type", art:"relay", purple:true},
+
+  {id:"story", sec:"players", name:"無限煉製 故事模式", emoji:"🗡️", chip:"p",
+   url:"https://pillars-of-creation-story.310156.workers.dev/",
+   desc:"無限煉製玩家變成遊戲人物了?傳入你的造物,在阿爾卑斯山上的 RPG 地圖對抗敵人,歡樂馳騁!",
+   author:"將軍的恩情", art:"story"}
+];
+
+/* 沒有縮圖的網站,用手繪的 SVG 插圖 */
+const ART = {
+  main:`<defs>
+    <radialGradient id="m1" cx="50%" cy="52%" r="72%"><stop offset="0" stop-color="#7a5322"/><stop offset=".55" stop-color="#2c1e10"/><stop offset="1" stop-color="#120d08"/></radialGradient>
+    <radialGradient id="m2"><stop offset="0" stop-color="#ffe9a8"/><stop offset="1" stop-color="#e9c46a" stop-opacity="0"/></radialGradient>
+    <linearGradient id="m3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a6efd8"/><stop offset="1" stop-color="#3f9d86"/></linearGradient>
+    <path id="sp" d="M0-7L1.8-1.8L7 0L1.8 1.8L0 7L-1.8 1.8L-7 0L-1.8-1.8Z"/>
+  </defs>
+  <rect width="320" height="180" fill="url(#m1)"/>
+  <circle cx="160" cy="92" r="74" fill="url(#m2)" opacity=".45"/>
+  <g fill="none" stroke="#e9c46a">
+    <circle cx="160" cy="92" r="68" stroke-width="1.6" stroke-opacity=".75"/>
+    <circle cx="160" cy="92" r="60" stroke-dasharray="2 5" stroke-opacity=".55"/>
+    <polygon points="160,24 198.8,145.4 97.2,71.6 222.8,71.6 121.2,145.4" stroke-opacity=".4"/>
+  </g>
+  <g>
+    <circle cx="160" cy="24" r="15" fill="#f2663b" opacity=".3"/><circle cx="160" cy="24" r="8" fill="#f2663b"/>
+    <circle cx="222.8" cy="71.6" r="15" fill="#5aa9f0" opacity=".3"/><circle cx="222.8" cy="71.6" r="8" fill="#5aa9f0"/>
+    <circle cx="198.8" cy="145.4" r="15" fill="#e9c46a" opacity=".3"/><circle cx="198.8" cy="145.4" r="8" fill="#e9c46a"/>
+    <circle cx="121.2" cy="145.4" r="15" fill="#7bd05a" opacity=".3"/><circle cx="121.2" cy="145.4" r="8" fill="#7bd05a"/>
+    <circle cx="97.2" cy="71.6" r="15" fill="#b48cff" opacity=".3"/><circle cx="97.2" cy="71.6" r="8" fill="#b48cff"/>
+  </g>
+  <path d="M146 102 H174 L186 118 Q192 130 180 130 H140 Q128 130 134 118 Z" fill="url(#m3)" opacity=".92"/>
+  <path d="M151 66 H169 V86 L186 118 Q192 130 180 130 H140 Q128 130 134 118 L151 86 Z" fill="#ffffff" fill-opacity=".1" stroke="#f4e8cc" stroke-width="2" stroke-linejoin="round"/>
+  <rect x="149" y="59" width="22" height="8" rx="2" fill="#8a5a2b"/>
+  <g fill="#e8fff6" opacity=".85"><circle cx="152" cy="116" r="3"/><circle cx="166" cy="110" r="2"/><circle cx="170" cy="122" r="3.5"/><circle cx="158" cy="124" r="2"/></g>
+  <g fill="#fff3c4"><use href="#sp" x="130" y="54"/><use href="#sp" x="196" y="104" /><use href="#sp" x="188" y="40" transform="scale(1)"/><use href="#sp" x="60" y="130"/><use href="#sp" x="262" y="124"/></g>`,
+
+  lounge:`<defs>
+    <linearGradient id="l1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b4524"/><stop offset="1" stop-color="#2a1b10"/></linearGradient>
+    <linearGradient id="l2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd27a"/><stop offset="1" stop-color="#f0834b"/></linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#l1)"/>
+  <polygon points="196,94 282,94 316,176 150,176" fill="#ffd98a" opacity=".13"/>
+  <rect y="130" width="320" height="50" fill="#2b1c10"/>
+  <g stroke="#3d2916" stroke-width="1.5"><line x1="0" y1="146" x2="320" y2="146"/><line x1="0" y1="162" x2="320" y2="162"/><line x1="70" y1="130" x2="40" y2="180"/><line x1="170" y1="130" x2="170" y2="180"/><line x1="270" y1="130" x2="300" y2="180"/></g>
+  <rect x="196" y="22" width="86" height="72" rx="4" fill="url(#l2)"/>
+  <circle cx="250" cy="72" r="15" fill="#fff0b8"/>
+  <path d="M196 94 Q230 62 282 90 V94Z" fill="#7a4a2a" opacity=".7"/>
+  <g stroke="#1b120a" stroke-width="4" fill="none"><rect x="196" y="22" width="86" height="72" rx="4"/><line x1="239" y1="22" x2="239" y2="94"/><line x1="196" y1="58" x2="282" y2="58"/></g>
+  <rect x="22" y="66" width="140" height="5" fill="#5a3a1b"/>
+  <g><rect x="32" y="42" width="16" height="24" rx="4" fill="#e0564a"/><rect x="36" y="34" width="8" height="9" fill="#f4e8cc"/>
+     <rect x="56" y="36" width="13" height="30" rx="3" fill="#5aa9f0"/><rect x="59" y="29" width="7" height="8" fill="#f4e8cc"/>
+     <rect x="78" y="46" width="20" height="20" rx="9" fill="#8fdc6a"/><rect x="85" y="38" width="6" height="9" fill="#f4e8cc"/>
+     <rect x="106" y="40" width="14" height="26" rx="4" fill="#b48cff"/><rect x="110" y="33" width="6" height="8" fill="#f4e8cc"/>
+     <rect x="128" y="50" width="22" height="16" rx="5" fill="#f2c14e"/></g>
+  <rect x="22" y="108" width="140" height="5" fill="#5a3a1b"/>
+  <g><rect x="30" y="84" width="10" height="24" fill="#8a3a2a"/><rect x="41" y="88" width="9" height="20" fill="#3b6a8a"/><rect x="51" y="82" width="11" height="26" fill="#6a5a2a"/><rect x="70" y="92" width="18" height="16" rx="2" fill="#e9c46a"/><rect x="120" y="88" width="30" height="20" rx="3" fill="#4a3a28"/></g>
+  <path d="M88 132 Q88 168 122 168 Q156 168 156 132 Z" fill="#1a1410" stroke="#7a5d38" stroke-width="2"/>
+  <ellipse cx="122" cy="132" rx="34" ry="8" fill="#47b394" stroke="#9a7740" stroke-width="3"/>
+  <g fill="#c8f7e6" opacity=".8"><circle cx="110" cy="131" r="3"/><circle cx="126" cy="129" r="4"/><circle cx="138" cy="133" r="2.5"/></g>
+  <g stroke="#f4e8cc" stroke-opacity=".4" stroke-width="2.5" fill="none" stroke-linecap="round"><path d="M112 118 q-9 -12 0 -22 q9 -10 0 -20"/><path d="M134 118 q9 -12 0 -20 q-9 -9 0 -18"/></g>
+  <g fill="#1a1410"><rect x="96" y="164" width="8" height="8"/><rect x="140" y="164" width="8" height="8"/></g>`,
+
+  cards:`<defs>
+    <linearGradient id="c1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b4a1c"/><stop offset="1" stop-color="#1a120b"/></linearGradient>
+    <linearGradient id="c2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7dc8e"/><stop offset="1" stop-color="#c9962f"/></linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#c1)"/>
+  <g transform="translate(160 98)">
+    <g transform="translate(-62 8) rotate(-18)"><rect x="-32" y="-48" width="64" height="96" rx="7" fill="#2b2140" stroke="#b48cff" stroke-width="2"/><circle r="14" fill="#b48cff" opacity=".6"/></g>
+    <g transform="translate(62 8) rotate(18)"><rect x="-32" y="-48" width="64" height="96" rx="7" fill="#1e3a36" stroke="#7fd0b8" stroke-width="2"/><circle r="14" fill="#7fd0b8" opacity=".6"/></g>
+    <g><rect x="-34" y="-54" width="68" height="104" rx="8" fill="#3a2414" stroke="url(#c2)" stroke-width="3"/>
+       <rect x="-27" y="-47" width="54" height="64" rx="4" fill="#120d08"/>
+       <polygon points="0,-36 14,-14 0,8 -14,-14" fill="url(#c2)"/>
+       <rect x="-24" y="24" width="48" height="5" rx="2.5" fill="#e9c46a" opacity=".8"/><rect x="-24" y="34" width="32" height="5" rx="2.5" fill="#e9c46a" opacity=".5"/></g>
+  </g>`,
+
+  tower:`<defs>
+    <linearGradient id="t1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1f4d"/><stop offset=".6" stop-color="#a6566e"/><stop offset="1" stop-color="#f0a16a"/></linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#t1)"/>
+  <g fill="#fff3d6"><circle cx="40" cy="22" r="1.4"/><circle cx="90" cy="40" r="1"/><circle cx="270" cy="20" r="1.4"/><circle cx="296" cy="52" r="1"/><circle cx="210" cy="16" r="1"/></g>
+  <g fill="#fff" opacity=".22"><ellipse cx="50" cy="110" rx="46" ry="10"/><ellipse cx="270" cy="96" rx="50" ry="11"/><ellipse cx="250" cy="150" rx="40" ry="8"/><ellipse cx="40" cy="160" rx="38" ry="8"/></g>
+  <path d="M62 140 H258 Q246 160 206 168 L172 186 L152 172 Q100 166 62 140Z" fill="#4a3322"/>
+  <path d="M62 140 Q160 156 258 140 Q160 128 62 140Z" fill="#5e8a4a"/>
+  <ellipse cx="160" cy="139" rx="46" ry="7" fill="#d8ccb0"/>
+  <line x1="232" y1="0" x2="232" y2="40" stroke="#f4e8cc" stroke-opacity=".6"/>
+  <g stroke-linejoin="round">
+    <polygon points="160,104 178,113 160,122 142,113" fill="#f5d88a"/><polygon points="142,113 160,122 160,140 142,131" fill="#c9962f"/><polygon points="160,122 178,113 178,131 160,140" fill="#a87a22"/>
+    <g transform="rotate(-5 164 90)"><polygon points="164,72 182,81 164,90 146,81" fill="#cdb2ff"/><polygon points="146,81 164,90 164,108 146,99" fill="#8a63d6"/><polygon points="164,90 182,81 182,99 164,108" fill="#6a46b0"/></g>
+    <g transform="rotate(7 158 58)"><polygon points="158,46 170,52 158,58 146,52" fill="#a6efd8"/><polygon points="146,52 158,58 158,70 146,64" fill="#4fb59a"/><polygon points="158,58 170,52 170,64 158,70" fill="#3a917c"/></g>
+    <g transform="rotate(-10 232 40)"><polygon points="232,40 244,46 232,52 220,46" fill="#ffb27a"/><polygon points="220,46 232,52 232,64 220,58" fill="#e8793f"/><polygon points="232,52 244,46 244,58 232,64" fill="#c95a26"/></g>
+  </g>`,
+
+  spin:`<defs>
+    <radialGradient id="s1" cx="50%" cy="55%" r="75%"><stop offset="0" stop-color="#432d6e"/><stop offset="1" stop-color="#150e22"/></radialGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#s1)"/>
+  <ellipse cx="160" cy="136" rx="136" ry="40" fill="#2a1d44" stroke="#b48cff" stroke-width="2"/>
+  <ellipse cx="160" cy="136" rx="100" ry="28" fill="none" stroke="#b48cff" stroke-opacity=".5" stroke-dasharray="4 5"/>
+  <ellipse cx="160" cy="136" rx="40" ry="11" fill="none" stroke="#b48cff" stroke-opacity=".5"/>
+  <g>
+    <ellipse cx="108" cy="144" rx="28" ry="6" fill="#000" opacity=".35"/>
+    <polygon points="100,126 116,126 108,146" fill="#cfcfe0"/>
+    <ellipse cx="108" cy="120" rx="30" ry="9" fill="#e8793f"/>
+    <path d="M80 118 Q108 84 136 118 Z" fill="#f5a566"/><path d="M92 112 Q108 94 124 112" fill="none" stroke="#fff3d6" stroke-opacity=".6" stroke-width="2"/>
+  </g>
+  <g>
+    <ellipse cx="216" cy="138" rx="28" ry="6" fill="#000" opacity=".35"/>
+    <polygon points="208,120 224,120 216,140" fill="#cfcfe0"/>
+    <ellipse cx="216" cy="114" rx="30" ry="9" fill="#2f9f88"/>
+    <path d="M188 112 Q216 78 244 112 Z" fill="#7fd9c4"/><path d="M200 106 Q216 88 232 106" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2"/>
+  </g>
+  <g fill="#ffe27a"><polygon points="162,98 167,108 178,104 170,113 178,122 166,119 160,129 156,118 144,120 152,110 144,102 156,105"/></g>
+  <g><rect x="140" y="36" width="12" height="12" fill="#e9c46a" transform="rotate(20 146 42)"/><rect x="184" y="28" width="10" height="10" fill="#7fd0b8" transform="rotate(-30 189 33)"/><rect x="118" y="62" width="9" height="9" fill="#f08a4b" transform="rotate(40 122 66)"/><rect x="212" y="58" width="11" height="11" fill="#b48cff" transform="rotate(15 217 63)"/><rect x="164" y="60" width="7" height="7" fill="#f4e8cc" transform="rotate(-20 167 63)"/></g>
+  <g stroke="#f4e8cc" stroke-opacity=".3" stroke-dasharray="3 4" fill="none"><path d="M160 98 Q150 70 146 48"/><path d="M162 98 Q180 66 189 36"/></g>`,
+
+  life:`<defs>
+    <radialGradient id="h1" cx="50%" cy="50%" r="70%"><stop offset="0" stop-color="#6a4826"/><stop offset="1" stop-color="#1b130d"/></radialGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#h1)"/>
+  <circle cx="160" cy="86" r="62" fill="#ffd98a" opacity=".12"/>
+  <rect x="132" y="18" width="56" height="7" rx="2" fill="#8a5a2b"/><rect x="132" y="141" width="56" height="7" rx="2" fill="#8a5a2b"/>
+  <path d="M140 25 H180 Q180 66 160 84 Q180 102 180 141 H140 Q140 102 160 84 Q140 66 140 25Z" fill="#fff4d0" fill-opacity=".1" stroke="#e9c46a" stroke-width="2"/>
+  <path d="M146 30 H174 Q172 56 160 72 Q148 56 146 30Z" fill="#f0c35a"/>
+  <path d="M144 139 Q160 108 176 139Z" fill="#f0c35a"/>
+  <line x1="160" y1="78" x2="160" y2="118" stroke="#f0c35a" stroke-width="1.5"/>
+  <path d="M46 78 H58 V92 L72 118 Q76 128 66 128 H38 Q28 128 32 118 L46 92 Z" fill="#5aa9f0" fill-opacity=".35" stroke="#f4e8cc" stroke-width="2" stroke-linejoin="round"/>
+  <rect x="44" y="72" width="16" height="7" rx="2" fill="#8a5a2b"/>
+  <g><rect x="236" y="60" width="52" height="64" rx="3" fill="#efe0b8"/><ellipse cx="236" cy="92" rx="5" ry="32" fill="#c9a24a"/><ellipse cx="288" cy="92" rx="5" ry="32" fill="#c9a24a"/>
+     <g fill="#8a6a3a"><rect x="246" y="72" width="34" height="3" rx="1.5"/><rect x="246" y="82" width="28" height="3" rx="1.5"/><rect x="246" y="92" width="34" height="3" rx="1.5"/><rect x="246" y="102" width="22" height="3" rx="1.5"/></g></g>
+  <line x1="24" y1="165" x2="296" y2="165" stroke="#e9c46a" stroke-opacity=".5" stroke-dasharray="3 5"/>
+  <g fill="#e9c46a"><circle cx="34" cy="165" r="3"/><circle cx="96" cy="165" r="4"/><circle cx="160" cy="165" r="5"/><circle cx="224" cy="165" r="4"/><circle cx="286" cy="165" r="3"/></g>`,
+
+  relay:`<defs>
+    <linearGradient id="r1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2d3a5c"/><stop offset="1" stop-color="#17131f"/></linearGradient>
+    <linearGradient id="r2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3d98a"/><stop offset="1" stop-color="#d9a83f"/></linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#r1)"/>
+  <circle cx="28" cy="40" r="11" fill="#7fd0b8"/>
+  <rect x="46" y="22" width="156" height="38" rx="14" fill="#5865f2"/>
+  <g fill="#fff"><rect x="60" y="32" width="104" height="5" rx="2.5" opacity=".9"/><rect x="60" y="44" width="70" height="5" rx="2.5" opacity=".6"/></g>
+  <circle cx="292" cy="86" r="11" fill="#b48cff"/>
+  <rect x="118" y="67" width="156" height="38" rx="14" fill="#3b3f5e" stroke="#6b72b8"/>
+  <g fill="#fff"><rect x="132" y="77" width="110" height="5" rx="2.5" opacity=".8"/><rect x="132" y="89" width="60" height="5" rx="2.5" opacity=".5"/></g>
+  <circle cx="28" cy="132" r="11" fill="#f08a4b"/>
+  <rect x="46" y="113" width="156" height="38" rx="14" fill="url(#r2)"/>
+  <g fill="#3a2a10"><rect x="60" y="123" width="96" height="5" rx="2.5" opacity=".85"/><rect x="60" y="135" width="74" height="5" rx="2.5" opacity=".6"/></g>
+  <g fill="none" stroke="#f4e8cc" stroke-opacity=".4" stroke-dasharray="3 4" stroke-linecap="round"><path d="M180 62 Q210 64 214 66"/><path d="M130 107 Q110 108 108 112"/></g>
+  <g fill="#f4e8cc" opacity=".7"><circle cx="236" cy="132" r="4"/><circle cx="252" cy="132" r="4" opacity=".7"/><circle cx="268" cy="132" r="4" opacity=".45"/></g>`,
+
+  story:`<defs>
+    <linearGradient id="y1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2d1f4d"/><stop offset="1" stop-color="#b3639c"/></linearGradient>
+  </defs>
+  <g shape-rendering="crispEdges">
+  <rect width="320" height="180" fill="url(#y1)"/>
+  <g fill="#fff3d6"><rect x="30" y="20" width="2" height="2"/><rect x="90" y="34" width="2" height="2"/><rect x="250" y="16" width="2" height="2"/><rect x="288" y="44" width="2" height="2"/><rect x="190" y="12" width="2" height="2"/></g>
+  <polygon points="0,140 50,84 84,110 140,50 200,112 240,80 320,130 320,140" fill="#4b3a73"/>
+  <polygon points="140,50 120,76 132,72 140,80 150,72 162,78" fill="#f4e8cc"/>
+  <polygon points="50,84 40,98 50,94 58,100 66,96" fill="#f4e8cc"/>
+  <polygon points="240,80 228,96 238,92 246,98 254,92" fill="#f4e8cc"/>
+  <polygon points="0,150 70,112 130,142 200,104 260,140 320,118 320,150" fill="#2e2450"/>
+  <rect y="140" width="320" height="40" fill="#2f5a3a"/>
+  <g fill="#376a44"><rect x="0" y="140" width="16" height="16"/><rect x="32" y="140" width="16" height="16"/><rect x="64" y="140" width="16" height="16"/><rect x="96" y="140" width="16" height="16"/><rect x="128" y="140" width="16" height="16"/><rect x="160" y="140" width="16" height="16"/><rect x="192" y="140" width="16" height="16"/><rect x="224" y="140" width="16" height="16"/><rect x="256" y="140" width="16" height="16"/><rect x="288" y="140" width="16" height="16"/>
+     <rect x="16" y="156" width="16" height="16"/><rect x="48" y="156" width="16" height="16"/><rect x="80" y="156" width="16" height="16"/><rect x="112" y="156" width="16" height="16"/><rect x="144" y="156" width="16" height="16"/><rect x="176" y="156" width="16" height="16"/><rect x="208" y="156" width="16" height="16"/><rect x="240" y="156" width="16" height="16"/><rect x="272" y="156" width="16" height="16"/><rect x="304" y="156" width="16" height="16"/></g>
+  <g fill="#1f4a30"><polygon points="24,138 12,152 36,152"/><polygon points="24,126 14,140 34,140"/><polygon points="24,114 16,128 32,128"/><rect x="22" y="152" width="4" height="6" fill="#5a3a1b"/>
+     <polygon points="286,138 274,152 298,152"/><polygon points="286,126 276,140 296,140"/><polygon points="286,114 278,128 294,128"/><rect x="284" y="152" width="4" height="6" fill="#5a3a1b"/></g>
+  <rect x="100" y="116" width="12" height="4" fill="#5a3a1b"/><rect x="100" y="120" width="12" height="10" fill="#f1c9a0"/><rect x="98" y="130" width="16" height="12" fill="#3f7de0"/><rect x="100" y="142" width="5" height="7" fill="#2a2a4a"/><rect x="107" y="142" width="5" height="7" fill="#2a2a4a"/>
+  <rect x="104" y="123" width="2" height="2" fill="#222"/><rect x="108" y="123" width="2" height="2" fill="#222"/>
+  <rect x="116" y="124" width="3" height="18" fill="#dfe6ee"/><rect x="113" y="134" width="9" height="2" fill="#e9c46a"/>
+  <rect x="196" y="140" width="28" height="8" fill="#7fd05a"/><rect x="200" y="132" width="20" height="8" fill="#7fd05a"/><rect x="204" y="128" width="12" height="4" fill="#7fd05a"/><rect x="204" y="134" width="3" height="3" fill="#111"/><rect x="212" y="134" width="3" height="3" fill="#111"/>
+  <g fill="#ffe27a"><rect x="150" y="124" width="4" height="12"/><rect x="146" y="128" width="12" height="4"/></g>
+  </g>`
+};
+
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function artSvg(key){
+  return `<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" role="img" aria-hidden="true">${ART[key]}</svg>`;
+}
+
+function card(g){
+  const el = document.createElement('article');
+  el.id = g.id;
+  el.className = 'card' + (g.feature ? ' feature' : '') + (g.purple ? ' purple' : '');
+  const thumb = g.img
+    ? `<img src="${esc(g.img)}" alt="${esc(g.name)} 縮圖" loading="lazy">`
+    : artSvg(g.art);
+  el.innerHTML = `
+    <a class="thumb" href="${esc(g.url)}" target="_blank" rel="noopener" aria-label="開啟 ${esc(g.name)}">${thumb}</a>
+    <div class="body">
+      <h3>${esc(g.name)}</h3>
+      <p>${esc(g.desc)}</p>
+      ${g.note ? `<div class="note">${esc(g.note)}</div>` : ''}
+      <div class="meta">
+        <span class="author">作者:${esc(g.author)}</span>
+        <a class="go" href="${esc(g.url)}" target="_blank" rel="noopener">開始玩</a>
+      </div>
+    </div>`;
+  if (g.img) {
+    // 縮圖載入失敗時,改用生成的插圖
+    el.querySelector('img').addEventListener('error', e => {
+      e.target.replaceWith(Object.assign(document.createElement('div'), {innerHTML: artSvg(g.art)}).firstChild);
+    });
+  }
+  return el;
+}
+
+const targets = {main:'g-main', funtuan:'g-funtuan', players:'g-players'};
+const chipsEl = document.getElementById('chips');
+GAMES.forEach(g => {
+  document.getElementById(targets[g.sec]).appendChild(card(g));
+  const a = document.createElement('a');
+  a.className = 'chip ' + g.chip;
+  a.href = '#' + g.id;
+  a.innerHTML = `<span class="e">${g.emoji}</span>${esc(g.name)}`;
+  chipsEl.appendChild(a);
+});
+</script>
+</body>
+</html>
