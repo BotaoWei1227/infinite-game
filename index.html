@@ -65,19 +65,20 @@ section{padding:34px 0 8px}
 .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--line)}
 .sec-head h2{font-family:var(--serif);font-size:24px;margin:0;color:var(--gold)}
 .sec-head span{color:var(--muted);font-size:14px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:18px}
+#g-main{grid-template-columns:minmax(0,1fr)}
 
 /* cards */
 .card{
   display:flex;flex-direction:column;background:var(--panel);border:1.5px solid var(--line);
-  border-radius:18px;overflow:hidden;scroll-margin-top:16px;
+  border-radius:18px;overflow:hidden;scroll-margin-top:16px;min-width:0;
   transition:transform .18s,box-shadow .18s,border-color .18s;
 }
 .card:hover{transform:translateY(-3px);border-color:var(--gold-soft);box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 22px rgba(233,196,106,.12)}
 .card.purple:hover{border-color:var(--purple);box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 22px rgba(180,140,255,.2)}
 .thumb{position:relative;aspect-ratio:16/9;background:#0e0a07;overflow:hidden}
 .thumb img,.thumb svg{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover}
-.body{display:flex;flex-direction:column;flex:1;padding:16px 18px 18px;gap:8px}
+.body{display:flex;flex-direction:column;flex:1;min-width:0;overflow-wrap:anywhere;padding:16px 18px 18px;gap:8px}
 .body h3{font-family:var(--serif);font-size:20px;margin:0;color:var(--cream)}
 .body p{margin:0;font-size:14px;color:#d3c4a4;flex:1}
 .note{font-size:13px;color:var(--orange1);background:rgba(240,138,75,.1);border:1px solid rgba(240,138,75,.35);border-radius:10px;padding:6px 10px}
@@ -89,11 +90,31 @@ section{padding:34px 0 8px}
 }
 .go:hover{filter:brightness(1.1)}
 
+
+/* likes */
+.thumb-link{position:absolute;inset:0;display:block}
+.like{
+  display:none;position:absolute;top:10px;right:10px;z-index:2;align-items:center;gap:6px;
+  padding:6px 12px 6px 10px;border-radius:999px;cursor:pointer;font:inherit;font-size:14px;font-weight:700;
+  color:var(--cream);background:rgba(20,15,10,.72);border:1.5px solid rgba(233,196,106,.4);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  transition:transform .12s,border-color .15s,background .15s;
+}
+.fb-on .like{display:inline-flex}
+.like svg{position:static;width:18px;height:18px;fill:none;stroke:var(--gold);stroke-width:2;stroke-linejoin:round;transition:fill .15s,stroke .15s,transform .15s}
+.like:hover{border-color:var(--gold)}
+.like:active{transform:scale(.94)}
+.like[aria-pressed="true"]{background:rgba(201,81,44,.28);border-color:var(--orange1)}
+.like[aria-pressed="true"] svg{fill:#f2663b;stroke:#f2663b;transform:scale(1.08)}
+.like:disabled{opacity:.6;cursor:wait}
+.like.err{border-color:#e5484d}
+.like .n{min-width:1ch;font-variant-numeric:tabular-nums}
+
 /* featured main game */
 .card.feature{border-color:var(--gold-soft);box-shadow:0 0 28px rgba(233,196,106,.16)}
-@media(min-width:720px){
+@media(min-width:760px){
   .card.feature{flex-direction:row}
-  .card.feature .thumb{flex:0 0 52%;aspect-ratio:auto;min-height:260px}
+  .card.feature .thumb{flex:0 0 46%;aspect-ratio:auto;min-height:280px}
   .card.feature .body{padding:26px 28px;justify-content:center}
   .card.feature h3{font-size:28px}
   .card.feature p{flex:none;font-size:16px}
@@ -353,7 +374,13 @@ function card(g){
     ? `<img src="${esc(g.img)}" alt="${esc(g.name)} 縮圖" loading="lazy">`
     : artSvg(g.art);
   el.innerHTML = `
-    <a class="thumb" href="${esc(g.url)}" target="_blank" rel="noopener" aria-label="開啟 ${esc(g.name)}">${thumb}</a>
+    <div class="thumb">
+      <a class="thumb-link" href="${esc(g.url)}" target="_blank" rel="noopener" aria-label="開啟 ${esc(g.name)}">${thumb}</a>
+      <button class="like" type="button" aria-pressed="false" aria-label="按讚 ${esc(g.name)}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.2-9.3C1.6 7.8 3.6 4.5 7 4.5c2 0 3.5 1.1 5 3 1.5-1.9 3-3 5-3 3.4 0 5.4 3.3 4.2 6.7C19.5 15.9 12 20.5 12 20.5Z"/></svg>
+        <span class="n">0</span>
+      </button>
+    </div>
     <div class="body">
       <h3>${esc(g.name)}</h3>
       <p>${esc(g.desc)}</p>
@@ -382,6 +409,79 @@ GAMES.forEach(g => {
   a.innerHTML = `<span class="e">${g.emoji}</span>${esc(g.name)}`;
   chipsEl.appendChild(a);
 });
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, collection, doc, onSnapshot, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+/* 把 Firebase 控制台給你的設定貼在這裡(專案設定 → 一般 → 你的應用程式) */
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT",
+  appId: "YOUR_APP_ID"
+};
+
+if (!firebaseConfig.apiKey.startsWith("YOUR_")) {
+  document.body.classList.add("fb-on");
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const cards = [...document.querySelectorAll(".card")];
+  const byId = Object.fromEntries(cards.map(c => [c.id, c.querySelector(".like")]));
+  const LS = id => "liked:" + id;
+
+  // 先用本機紀錄顯示「我按過讚」,點擊時會再跟伺服器核對
+  for (const [id, btn] of Object.entries(byId)) {
+    btn.setAttribute("aria-pressed", localStorage.getItem(LS(id)) === "1" ? "true" : "false");
+  }
+
+  // 即時讀取所有讚數
+  onSnapshot(collection(db, "likes"), snap => {
+    snap.forEach(d => {
+      const btn = byId[d.id];
+      if (btn) btn.querySelector(".n").textContent = d.data().count ?? 0;
+    });
+  }, err => console.warn("讀取讚數失敗", err));
+
+  const ready = new Promise(res => onAuthStateChanged(auth, u => u && res(u)));
+  signInAnonymously(auth).catch(err => console.warn("匿名登入失敗", err));
+
+  for (const [id, btn] of Object.entries(byId)) {
+    btn.addEventListener("click", async () => {
+      btn.disabled = true;
+      try {
+        const user = await ready;
+        const cRef = doc(db, "likes", id);
+        const uRef = doc(db, "likes", id, "users", user.uid);
+        const liked = await runTransaction(db, async tx => {
+          const [c, u] = await Promise.all([tx.get(cRef), tx.get(uRef)]);
+          const n = c.exists() ? c.data().count : 0;
+          if (u.exists()) {
+            tx.delete(uRef);
+            tx.set(cRef, { count: Math.max(0, n - 1) });
+            return false;
+          }
+          tx.set(uRef, { t: serverTimestamp() });
+          tx.set(cRef, { count: n + 1 });
+          return true;
+        });
+        btn.setAttribute("aria-pressed", String(liked));
+        btn.setAttribute("aria-label", (liked ? "取消讚 " : "按讚 ") + id);
+        liked ? localStorage.setItem(LS(id), "1") : localStorage.removeItem(LS(id));
+      } catch (e) {
+        console.error(e);
+        btn.classList.add("err");
+        setTimeout(() => btn.classList.remove("err"), 1500);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+}
 </script>
 </body>
 </html>

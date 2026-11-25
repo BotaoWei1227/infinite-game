@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 只允許這些遊戲 id(之後新增遊戲要同步加在這裡)
+    function validGame(id) {
+      return id in ['main', 'lounge', 'cards', 'tower', 'spin', 'life', 'relay', 'story'];
+    }
+
+    match /likes/{gameId} {
+      function userLike() {
+        return /databases/$(database)/documents/likes/$(gameId)/users/$(request.auth.uid);
+      }
+      function onlyCount() {
+        return request.resource.data.keys().hasOnly(['count'])
+            && request.resource.data.count is int;
+      }
+
+      // 任何人都能看讚數
+      allow read: if true;
+
+      // 第一個讚:建立計數文件,數字必須是 1,且同一批次要一併建立自己的按讚紀錄
+      allow create: if request.auth != null
+                    && validGame(gameId)
+                    && onlyCount()
+                    && request.resource.data.count == 1
+                    && existsAfter(userLike());
+
+      allow update: if request.auth != null
+                    && validGame(gameId)
+                    && onlyCount()
+                    && (
+                      // 按讚:+1,且同一批次新增自己的按讚紀錄
+                      (request.resource.data.count == resource.data.count + 1
+                        && !exists(userLike())
+                        && existsAfter(userLike()))
+                      ||
+                      // 取消讚:-1,且同一批次刪除自己的按讚紀錄
+                      (request.resource.data.count == resource.data.count - 1
+                        && request.resource.data.count >= 0
+                        && exists(userLike())
+                        && !existsAfter(userLike()))
+                    );
+
+      allow delete: if false;
+
+      // 每個使用者對每款遊戲只有一筆紀錄,只能碰自己的
+      match /users/{uid} {
+        allow read: if request.auth != null && request.auth.uid == uid;
+        allow create: if request.auth != null
+                      && request.auth.uid == uid
+                      && validGame(gameId)
+                      && request.resource.data.keys().hasOnly(['t'])
+                      && request.resource.data.t == request.time;
+        allow update: if false;
+        allow delete: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+  }
+}
