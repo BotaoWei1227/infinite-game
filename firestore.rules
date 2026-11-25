@@ -4,7 +4,7 @@ service cloud.firestore {
 
     // 只允許這些遊戲 id(之後新增遊戲要同步加在這裡)
     function validGame(id) {
-      return id in ['main', 'lounge', 'cards', 'tower', 'spin', 'life', 'relay', 'story'];
+      return id in ['main', 'lounge', 'cards', 'tower', 'spin', 'alchetale', 'life', 'relay', 'story'];
     }
 
     match /likes/{gameId} {

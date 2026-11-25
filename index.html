@@ -91,6 +91,9 @@ section{padding:34px 0 8px}
 .go:hover{filter:brightness(1.1)}
 
 
+.thumb.contain{background:radial-gradient(ellipse at 50% 45%,#5a4519 0,#241a10 60%,#140f0a 100%)}
+.thumb.contain img{object-fit:contain;padding:10px 0}
+.note.gold{color:var(--gold);background:rgba(233,196,106,.1);border-color:rgba(233,196,106,.4)}
 /* likes */
 .thumb-link{position:absolute;inset:0;display:block}
 .like{
@@ -177,6 +180,13 @@ const GAMES = [
    url:"https://alchemy-spin.funtuan.workers.dev/",
    desc:"3D 賦形陀螺對戰,撞擊會把方塊打飛,顏色決定戰鬥能力。連勝挑戰,看你能贏幾場。",
    author:"Funtuan", art:"spin"},
+
+  {id:"alchetale", sec:"players", name:"煉途物語 Alchetale", emoji:"🛡️", chip:"g",
+   url:"https://alchetale.com/",
+   img:"https://alchetale.com/assets/icon-512.png", contain:true,
+   desc:"把你在《無限煉製》的賦形帶進 3D 世界一起冒險吧!免下載,打開網頁就能遊玩。",
+   note:"目前仍在開發中", noteGold:true,
+   author:"魔女會", art:"alchetale"},
 
   {id:"life", sec:"players", name:"煉金術師的一生", emoji:"📜", chip:"p",
    url:"https://alchemist-life.pages.dev/",
@@ -303,6 +313,17 @@ const ART = {
   <g><rect x="140" y="36" width="12" height="12" fill="#e9c46a" transform="rotate(20 146 42)"/><rect x="184" y="28" width="10" height="10" fill="#7fd0b8" transform="rotate(-30 189 33)"/><rect x="118" y="62" width="9" height="9" fill="#f08a4b" transform="rotate(40 122 66)"/><rect x="212" y="58" width="11" height="11" fill="#b48cff" transform="rotate(15 217 63)"/><rect x="164" y="60" width="7" height="7" fill="#f4e8cc" transform="rotate(-20 167 63)"/></g>
   <g stroke="#f4e8cc" stroke-opacity=".3" stroke-dasharray="3 4" fill="none"><path d="M160 98 Q150 70 146 48"/><path d="M162 98 Q180 66 189 36"/></g>`,
 
+  alchetale:`<defs>
+    <radialGradient id="k1" cx="50%" cy="45%" r="75%"><stop offset="0" stop-color="#6a5220"/><stop offset="1" stop-color="#140f0a"/></radialGradient>
+    <linearGradient id="k2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7dc8e"/><stop offset="1" stop-color="#c9962f"/></linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#k1)"/>
+  <path d="M0 150 Q60 120 120 142 T240 136 T320 144 V180 H0Z" fill="#2a1f12"/>
+  <path d="M160 30 L210 46 V94 Q210 128 160 150 Q110 128 110 94 V46 Z" fill="#241a10" stroke="url(#k2)" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M160 42 L198 54 V92 Q198 118 160 136 Q122 118 122 92 V54Z" fill="none" stroke="#e9c46a" stroke-opacity=".4"/>
+  <rect x="156" y="52" width="8" height="64" rx="2" fill="#f4e8cc"/><rect x="140" y="104" width="40" height="7" rx="3" fill="url(#k2)"/><rect x="157" y="111" width="6" height="16" rx="2" fill="#8a5a2b"/>
+  <g fill="#fff3c4"><path d="M60 50l2-6 2 6 6 2-6 2-2 6-2-6-6-2z"/><path d="M258 38l2-6 2 6 6 2-6 2-2 6-2-6-6-2z"/><path d="M240 110l1.5-4 1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5z"/></g>`,
+
   life:`<defs>
     <radialGradient id="h1" cx="50%" cy="50%" r="70%"><stop offset="0" stop-color="#6a4826"/><stop offset="1" stop-color="#1b130d"/></radialGradient>
   </defs>
@@ -374,7 +395,7 @@ function card(g){
     ? `<img src="${esc(g.img)}" alt="${esc(g.name)} 縮圖" loading="lazy">`
     : artSvg(g.art);
   el.innerHTML = `
-    <div class="thumb">
+    <div class="thumb${g.contain ? ' contain' : ''}">
       <a class="thumb-link" href="${esc(g.url)}" target="_blank" rel="noopener" aria-label="開啟 ${esc(g.name)}">${thumb}</a>
       <button class="like" type="button" aria-pressed="false" aria-label="按讚 ${esc(g.name)}">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.2-9.3C1.6 7.8 3.6 4.5 7 4.5c2 0 3.5 1.1 5 3 1.5-1.9 3-3 5-3 3.4 0 5.4 3.3 4.2 6.7C19.5 15.9 12 20.5 12 20.5Z"/></svg>
@@ -384,7 +405,7 @@ function card(g){
     <div class="body">
       <h3>${esc(g.name)}</h3>
       <p>${esc(g.desc)}</p>
-      ${g.note ? `<div class="note">${esc(g.note)}</div>` : ''}
+      ${g.note ? `<div class="note${g.noteGold ? ' gold' : ''}">${esc(g.note)}</div>` : ''}
       <div class="meta">
         <span class="author">作者:${esc(g.author)}</span>
         <a class="go" href="${esc(g.url)}" target="_blank" rel="noopener">開始玩</a>
@@ -418,13 +439,10 @@ import { getFirestore, collection, doc, onSnapshot, runTransaction, serverTimest
 
 /* 把 Firebase 控制台給你的設定貼在這裡(專案設定 → 一般 → 你的應用程式) */
 const firebaseConfig = {
-  apiKey: "AIzaSyD7HsmK0LvftOsQTZ0vwR7NTLfXZXcYmis",
-  authDomain: "infinite-games-d2b75.firebaseapp.com",
-  projectId: "infinite-games-d2b75",
-  storageBucket: "infinite-games-d2b75.firebasestorage.app",
-  messagingSenderId: "129129111516",
-  appId: "1:129129111516:web:fa083fc4e25ba8f8fe7919",
-  measurementId: "G-003DGX030V"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT",
+  appId: "YOUR_APP_ID"
 };
 
 if (!firebaseConfig.apiKey.startsWith("YOUR_")) {
